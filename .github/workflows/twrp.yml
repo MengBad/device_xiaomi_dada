@@ -51,7 +51,7 @@ jobs:
           cd twrp-source
           export ALLOW_MISSING_DEPENDENCIES=true
           source build/envsetup.sh
-          lunch twrp_dada-trunk_staging-eng
+          lunch twrp_dada-ap2a-eng
           make recoveryimage -j$(nproc --all)
 
       - name: Upload TWRP Recovery Image
