@@ -2,4 +2,4 @@ PRODUCT_MAKEFILES := \
     $(LOCAL_DIR)/twrp_dada.mk
 
 COMMON_LUNCH_CHOICES := \
-    twrp_dada-eng
+    twrp_dada-trunk_staging-eng
