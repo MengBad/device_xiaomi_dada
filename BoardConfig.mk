@@ -39,6 +39,22 @@ BOARD_BOOTIMAGE_PARTITION_SIZE := 100663296
 BOARD_RECOVERYIMAGE_PARTITION_SIZE := 104857600
 BOARD_VENDOR_BOOTIMAGE_PARTITION_SIZE := 100663296
 
+# A/B
+AB_OTA_UPDATER := true
+AB_OTA_PARTITIONS := \
+    boot \
+    dtbo \
+    init_boot \
+    vendor_boot \
+    recovery \
+    vbmeta \
+    vbmeta_system \
+    system \
+    vendor \
+    product \
+    system_ext \
+    odm
+
 # Platform
 TARGET_BOARD_PLATFORM := sun
 TARGET_BOARD_PLATFORM_GPU := qcom-adreno
