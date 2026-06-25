@@ -1,0 +1,19 @@
+# mount point   fstype  device                                  flags
+/system         erofs   system                                  wait,slotselect,logical,first_stage_mount
+/system_ext     erofs   system_ext                              wait,slotselect,logical,first_stage_mount
+/product        erofs   product                                 wait,slotselect,logical,first_stage_mount
+/vendor         erofs   vendor                                  wait,slotselect,logical,first_stage_mount
+/odm            erofs   odm                                     wait,slotselect,logical,first_stage_mount
+/mi_ext         erofs   mi_ext                                  wait,slotselect,logical,first_stage_mount,nofail
+
+/metadata       f2fs    /dev/block/by-name/metadata             flags=display="Metadata";wrappedkey
+/data           f2fs    /dev/block/by-name/userdata             flags=fileencryption=ice:wrappedkey:keydirectory=/metadata/vold/metadata_encryption
+
+/boot           emmc    /dev/block/by-name/boot                 flags=slotselect
+/init_boot      emmc    /dev/block/by-name/init_boot            flags=slotselect
+/vendor_boot    emmc    /dev/block/by-name/vendor_boot          flags=slotselect;display="Vendor Boot";backup=1
+/recovery       emmc    /dev/block/by-name/recovery             flags=slotselect;display="Recovery";backup=1
+/dtbo           emmc    /dev/block/by-name/dtbo                 flags=slotselect;display="DTBO";backup=1
+/vbmeta         emmc    /dev/block/by-name/vbmeta               flags=slotselect;display="VBMeta";backup=1
+/vbmeta_system  emmc    /dev/block/by-name/vbmeta_system        flags=slotselect;display="VBMeta System";backup=1
+/misc           emmc    /dev/block/by-name/misc

@@ -1,0 +1,62 @@
+name: Compile Custom TWRP for Xiaomi 15 (dada)
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build TWRP Recovery
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Free Disk Space
+        run: |
+          sudo docker image prune -a -f
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /usr/local/share/boost
+          sudo rm -rf /usr/share/swift /usr/share/rust /usr/local/share/phantomjs
+          df -h
+
+      - name: Install Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y git-core gnupg flex bison gperf build-essential zip curl \
+            zlib1g-dev gcc-multilib g++-multilib libc6-dev-i386 lib32ncurses5-dev \
+            x11proto-core-dev libx11-dev lib32z1-dev libgl1-mesa-dev libxml2-utils \
+            xsltproc unzip python3 rsync
+          sudo curl -o /usr/local/bin/repo https://storage.googleapis.com/git-repo-downloads/repo
+          sudo chmod a+x /usr/local/bin/repo
+
+      - name: Set Git Config
+        run: |
+          git config --global user.name "MengBad"
+          git config --global user.email "mengbad@qq.com"
+
+      - name: Initialize TWRP Source Tree
+        run: |
+          mkdir twrp-source
+          cd twrp-source
+          repo init -u https://github.com/minimal-manifest-twrp/platform_manifest_twrp_aosp.git -b twrp-14.0 --depth=1
+          repo sync -c -j$(nproc --all) --force-sync --no-clone-bundle --no-tags
+          df -h
+
+      - name: Checkout Device Tree
+        uses: actions/checkout@v4
+        with:
+          path: twrp-source/device/xiaomi/dada
+
+      - name: Run TWRP Compilation
+        run: |
+          cd twrp-source
+          export ALLOW_MISSING_DEPENDENCIES=true
+          source build/envsetup.sh
+          lunch twrp_dada-eng
+          make recoveryimage -j$(nproc --all)
+
+      - name: Upload TWRP Recovery Image
+        uses: actions/upload-artifact@v4
+        with:
+          name: twrp-dada-recovery
+          path: twrp-source/out/target/product/dada/recovery.img
+          if-no-files-found: error

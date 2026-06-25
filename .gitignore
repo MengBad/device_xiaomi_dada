@@ -1,0 +1,9 @@
+unpacked_images/
+xiaomi15_twrp_ramdisk/
+scratch/
+.pnpm-store/
+node_modules/
+*.log
+*.zip
+*.tgz
+*.tar
