@@ -53,8 +53,8 @@ jobs:
           source build/envsetup.sh
           lunch twrp_dada-ap2a-eng
           make ramdisk -j$(nproc --all)
-          mkdir -p out/target/product/dada
-          ln -sf ramdisk out/target/product/dada/root
+          mkdir -p out/target/product/dada/root
+          rsync -a out/target/product/dada/ramdisk/ out/target/product/dada/root/
           make recoveryimage -j$(nproc --all)
 
       - name: Upload TWRP Recovery Image
