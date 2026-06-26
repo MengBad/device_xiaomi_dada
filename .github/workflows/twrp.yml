@@ -52,7 +52,7 @@ jobs:
           export ALLOW_MISSING_DEPENDENCIES=true
           source build/envsetup.sh
           lunch twrp_dada-ap2a-eng
-          make recoveryimage -j$(nproc --all)
+          make ramdisk recoveryimage -j$(nproc --all)
 
       - name: Upload TWRP Recovery Image
         uses: actions/upload-artifact@v4
