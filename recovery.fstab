@@ -16,4 +16,5 @@
 /dtbo           emmc    /dev/block/by-name/dtbo                 flags=slotselect;display="DTBO";backup=1
 /vbmeta         emmc    /dev/block/by-name/vbmeta               flags=slotselect;display="VBMeta";backup=1
 /vbmeta_system  emmc    /dev/block/by-name/vbmeta_system        flags=slotselect;display="VBMeta System";backup=1
+/super          emmc    /dev/block/by-name/super                flags=display="Super";backup=1
 /misc           emmc    /dev/block/by-name/misc
