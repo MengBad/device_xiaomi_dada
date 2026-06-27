@@ -65,7 +65,6 @@ AB_OTA_PARTITIONS := \
 # Platform
 TARGET_BOARD_PLATFORM := sun
 TARGET_BOARD_PLATFORM_GPU := qcom-adreno
-TARGET_SYSTEM_PROP := $(DEVICE_PATH)/system.prop
 
 # Verified Boot (AVB)
 BOARD_AVB_ENABLE := true

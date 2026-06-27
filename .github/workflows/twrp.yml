@@ -54,6 +54,18 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-ccache-
 
+      - name: Patch Platform Version Variables
+        run: |
+          echo "=== Original Version Variables ==="
+          grep -E "PLATFORM_VERSION\s*:=|PLATFORM_SDK_VERSION\s*:=" twrp-source/build/core/version_defaults.mk || true
+          
+          echo "=== Patching Version Variables ==="
+          sed -i 's/^\s*PLATFORM_VERSION\s*:=\s*[0-9]*/PLATFORM_VERSION := 15/g' twrp-source/build/core/version_defaults.mk
+          sed -i 's/^\s*PLATFORM_SDK_VERSION\s*:=\s*[0-9]*/PLATFORM_SDK_VERSION := 35/g' twrp-source/build/core/version_defaults.mk
+          
+          echo "=== Patched Version Variables ==="
+          grep -E "PLATFORM_VERSION\s*:=|PLATFORM_SDK_VERSION\s*:=" twrp-source/build/core/version_defaults.mk || true
+
       - name: Run TWRP Compilation
         run: |
           cd twrp-source
