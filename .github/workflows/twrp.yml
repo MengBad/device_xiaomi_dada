@@ -56,7 +56,13 @@ jobs:
 
       - name: Patch Platform Version Variables
         run: |
-          file_path=$(find twrp-source -name "version_defaults.mk" | head -n 1)
+          echo "=== Debug Info ==="
+          pwd
+          ls -la
+          ls -la twrp-source || true
+          
+          echo "=== Locating version_defaults.mk ==="
+          file_path=$(find . -name "version_defaults.mk" | head -n 1)
           if [ -n "$file_path" ]; then
             echo "Found version_defaults.mk at: $file_path"
             echo "=== Original Version Variables ==="
@@ -69,7 +75,7 @@ jobs:
             echo "=== Patched Version Variables ==="
             grep -E "PLATFORM_VERSION\s*:=|PLATFORM_SDK_VERSION\s*:=" "$file_path" || true
           else
-            echo "ERROR: Could not locate version_defaults.mk in the source tree!"
+            echo "ERROR: Could not locate version_defaults.mk anywhere in workspace!"
             exit 1
           fi
 
