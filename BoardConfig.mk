@@ -17,6 +17,7 @@ TARGET_NO_BOOTLOADER := true
 BOARD_KERNEL_CMDLINE := video=vfb:640x400,bpp=32,memsize=3072000 erofs.reserved_pages=64 swinfo.fingerprint=dada:15/OS3.0.7.0.WOCCNXM:user mtdoops.fingerprint=dada:15/OS3.0.7.0.WOCCNXM:user bootmonitor.fingerprint=dada:15/OS3.0.7.0.WOCCNXM:user lz4asm.support=1 minidump.stack_dump=true bootconfig
 BOARD_BOOT_HEADER_VERSION := 4
 BOARD_KERNEL_PAGESIZE := 4096
+BOARD_EXCLUDE_KERNEL_FROM_RECOVERY_IMAGE := true
 
 BOARD_RAMDISK_OFFSET := 0x01000000
 BOARD_TAGS_OFFSET := 0x00000100
