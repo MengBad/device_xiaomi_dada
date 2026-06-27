@@ -56,15 +56,22 @@ jobs:
 
       - name: Patch Platform Version Variables
         run: |
-          echo "=== Original Version Variables ==="
-          grep -E "PLATFORM_VERSION\s*:=|PLATFORM_SDK_VERSION\s*:=" twrp-source/build/make/core/version_defaults.mk || true
-          
-          echo "=== Patching Version Variables ==="
-          sed -i 's/^\s*PLATFORM_VERSION\s*:=\s*[0-9]*/PLATFORM_VERSION := 15/g' twrp-source/build/make/core/version_defaults.mk
-          sed -i 's/^\s*PLATFORM_SDK_VERSION\s*:=\s*[0-9]*/PLATFORM_SDK_VERSION := 35/g' twrp-source/build/make/core/version_defaults.mk
-          
-          echo "=== Patched Version Variables ==="
-          grep -E "PLATFORM_VERSION\s*:=|PLATFORM_SDK_VERSION\s*:=" twrp-source/build/make/core/version_defaults.mk || true
+          file_path=$(find twrp-source -name "version_defaults.mk" | head -n 1)
+          if [ -n "$file_path" ]; then
+            echo "Found version_defaults.mk at: $file_path"
+            echo "=== Original Version Variables ==="
+            grep -E "PLATFORM_VERSION\s*:=|PLATFORM_SDK_VERSION\s*:=" "$file_path" || true
+            
+            echo "=== Patching Version Variables ==="
+            sed -i 's/^\s*PLATFORM_VERSION\s*:=\s*[0-9]*/PLATFORM_VERSION := 15/g' "$file_path"
+            sed -i 's/^\s*PLATFORM_SDK_VERSION\s*:=\s*[0-9]*/PLATFORM_SDK_VERSION := 35/g' "$file_path"
+            
+            echo "=== Patched Version Variables ==="
+            grep -E "PLATFORM_VERSION\s*:=|PLATFORM_SDK_VERSION\s*:=" "$file_path" || true
+          else
+            echo "ERROR: Could not locate version_defaults.mk in the source tree!"
+            exit 1
+          fi
 
       - name: Run TWRP Compilation
         run: |
