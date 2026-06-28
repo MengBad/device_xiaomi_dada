@@ -12,16 +12,25 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Maximize Build Space
-        uses: easimon/maximize-build-space@v1.3.1
-        with:
-          root-reserve-mb: 5120
-          temp-reserve-mb: 100
-          remove-dotnet: 'true'
-          remove-android: 'true'
-          remove-haskell: 'true'
-          remove-codeql: 'true'
-          remove-docker-images: 'true'
-          overprovision-lvm: 'true'
+        run: |
+          echo "=== Disk Space Before Cleanup ==="
+          df -h
+          
+          echo "=== Cleaning up large unused directories ==="
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /usr/local/lib/android
+          sudo rm -rf /opt/ghc
+          sudo rm -rf /opt/hostedtoolcache/CodeQL
+          sudo rm -rf /usr/share/swift
+          sudo rm -rf /usr/share/rust
+          sudo rm -rf /usr/local/share/boost
+          sudo rm -rf /usr/lib/jvm
+          
+          echo "=== Cleaning up docker images ==="
+          sudo docker image prune -a -f
+          
+          echo "=== Disk Space After Cleanup ==="
+          df -h
 
       - name: Install Dependencies
         run: |
