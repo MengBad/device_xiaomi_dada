@@ -16,6 +16,11 @@ jobs:
           echo "=== Disk Space Before Cleanup ==="
           df -h
           
+          echo "=== Purging large packages ==="
+          sudo apt-get remove -y --purge snapd google-chrome-stable microsoft-edge-stable firefox || true
+          sudo apt-get autoremove -y
+          sudo apt-get clean
+          
           echo "=== Cleaning up large unused directories ==="
           sudo rm -rf /usr/share/dotnet
           sudo rm -rf /usr/local/lib/android
@@ -25,6 +30,7 @@ jobs:
           sudo rm -rf /usr/share/rust
           sudo rm -rf /usr/local/share/boost
           sudo rm -rf /usr/lib/jvm
+          sudo rm -rf /var/lib/snapd
           
           echo "=== Cleaning up docker images ==="
           sudo docker image prune -a -f
@@ -114,7 +120,7 @@ jobs:
           export USE_CCACHE=1
           export CCACHE_DIR=~/.ccache
           export GOGC=50
-          export GOMEMLIMIT=5GiB
+          export GOMEMLIMIT=4GiB
           ccache -M 5G
           source build/envsetup.sh
           lunch twrp_dada-ap2a-eng
