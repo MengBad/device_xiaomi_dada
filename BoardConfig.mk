@@ -69,6 +69,7 @@ RECOVERY_SDCARD_ON_DATA := true
 # Copy vendor/odm files cleanly to recovery ramdisk
 TARGET_COPY_OUT_VENDOR := vendor
 TARGET_COPY_OUT_ODM := odm
+BOARD_ODMIMAGE_FILE_SYSTEM_TYPE := ext4
 
 # Recovery Fstab Binding
 TARGET_RECOVERY_FSTAB := $(DEVICE_PATH)/recovery.fstab
