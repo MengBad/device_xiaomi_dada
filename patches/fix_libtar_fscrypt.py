@@ -20,7 +20,7 @@ if os.path.exists(libtar_dir):
 else:
     print(f"Directory not found: {libtar_dir}")
 
-# 2. Patch libtar.h to fix the struct fscrypt_policy tag issue
+# 2. Patch libtar.h to fix the struct fscrypt_policy tag issue and define TAR_STORE_FSCRYPT_POL unconditionally
 libtar_h = 'bootable/recovery/libtar/libtar.h'
 if os.path.exists(libtar_h):
     print(f"Fixing fscrypt struct tag in {libtar_h}...")
@@ -32,6 +32,9 @@ if os.path.exists(libtar_h):
     new_content = content.replace('fscrypt_policy  *fep;', 'struct fscrypt_policy  *fep;')
     new_content = new_content.replace('fscrypt_policy *fep;', 'struct fscrypt_policy *fep;')
     new_content = new_content.replace('fscrypt_policy\t*fep;', 'struct fscrypt_policy\t*fep;')
+    
+    # Unconditionally define TAR_STORE_FSCRYPT_POL to prevent compilation failures in twrpTar.cpp
+    new_content += "\n#ifndef TAR_STORE_FSCRYPT_POL\n#define TAR_STORE_FSCRYPT_POL 512\n#endif\n"
     
     with open(libtar_h, 'w') as f:
         f.write(new_content)
