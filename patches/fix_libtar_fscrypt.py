@@ -24,7 +24,13 @@ if os.path.exists(libtar_h):
     print(f"Fixing fscrypt struct tag in {libtar_h}...")
     with open(libtar_h, 'r') as f:
         content = f.read()
-    new_content = content.replace('fscrypt_policy\t*fep;', 'struct fscrypt_policy\t*fep;')
+    
+    # Replace the fscrypt_policy type reference with 'struct fscrypt_policy'
+    # using different possible spacings (two spaces, one space, tab) to be robust.
+    new_content = content.replace('fscrypt_policy  *fep;', 'struct fscrypt_policy  *fep;')
+    new_content = new_content.replace('fscrypt_policy *fep;', 'struct fscrypt_policy *fep;')
+    new_content = new_content.replace('fscrypt_policy\t*fep;', 'struct fscrypt_policy\t*fep;')
+    
     with open(libtar_h, 'w') as f:
         f.write(new_content)
     print(f"Successfully patched {libtar_h}")
