@@ -42,12 +42,17 @@ if os.path.exists(libtar_h):
 else:
     print(f"File not found: {libtar_h}")
 
-# 3. Patch partitionmanager.cpp to add weak stubs for missing legacy FDE functions
-partitionmanager_cpp = 'bootable/recovery/partitionmanager.cpp'
-if os.path.exists(partitionmanager_cpp):
-    print(f"Adding cryptfs stubs to {partitionmanager_cpp}...")
-    with open(partitionmanager_cpp, 'r') as f:
-        content = f.read()
+# 3. Scan all .cpp and .c files in bootable/recovery/ and add weak stubs for missing legacy FDE functions if referenced.
+recovery_dir = 'bootable/recovery'
+if os.path.exists(recovery_dir):
+    print(f"Scanning {recovery_dir} for legacy FDE functions...")
+    fde_funcs = [
+        'cryptfs_get_password_type',
+        'cryptfs_check_passwd',
+        'cryptfs_check_footer',
+        'delete_crypto_blk_dev',
+        'set_partition_data'
+    ]
     
     stubs = """
 #ifdef __cplusplus
@@ -55,13 +60,36 @@ extern "C" {
 #endif
     int __attribute__((weak)) cryptfs_get_password_type(void) { return -1; }
     int __attribute__((weak)) cryptfs_check_passwd(const char* password) { return -1; }
+    int __attribute__((weak)) cryptfs_check_footer(void) { return -1; }
+    int __attribute__((weak)) delete_crypto_blk_dev(const char* name) { return -1; }
+    void __attribute__((weak)) set_partition_data(const char* path, const char* key_loc) {}
 #ifdef __cplusplus
 }
 #endif
 """
-    if 'cryptfs_get_password_type(void)' not in content:
-        with open(partitionmanager_cpp, 'w') as f:
-            f.write(stubs + content)
-        print(f"Successfully patched {partitionmanager_cpp}")
+    for root, dirs, files in os.walk(recovery_dir):
+        # Exclude libtar to avoid patching library files
+        if 'libtar' in root:
+            continue
+        for file in files:
+            if file.endswith(('.cpp', '.c')):
+                filepath = os.path.join(root, file)
+                with open(filepath, 'r') as f:
+                    content = f.read()
+                
+                # Check if file references any of the legacy FDE functions
+                needs_stubs = False
+                for func in fde_funcs:
+                    if func in content:
+                        # Make sure it's not already defined or our own stub
+                        if f"__attribute__((weak)) {func}" not in content:
+                            needs_stubs = True
+                            break
+                
+                if needs_stubs:
+                    print(f"Adding legacy FDE stubs to {filepath}...")
+                    with open(filepath, 'w') as f:
+                        f.write(stubs + content)
+                    print(f"Successfully patched {filepath}")
 else:
-    print(f"File not found: {partitionmanager_cpp}")
+    print(f"Directory not found: {recovery_dir}")
