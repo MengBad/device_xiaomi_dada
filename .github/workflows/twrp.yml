@@ -79,94 +79,18 @@ jobs:
       - name: Patch libtar fscrypt v1/v2 compatibility
         run: |
           cd twrp-source
-          APPEND_C="bootable/recovery/libtar/append.c"
+          echo "=== Patching libtar fscrypt v1/v2 API compatibility ==="
+          python3 device/xiaomi/dada/patches/fix_libtar_fscrypt.py
 
-          if [ -f "$APPEND_C" ]; then
-            echo "=== Patching libtar fscrypt v1/v2 API compatibility ==="
-            python3 << 'PYEOF'
-import re
-
-with open('bootable/recovery/libtar/append.c', 'r') as f:
-    lines = f.readlines()
-
-print(f"Total lines: {len(lines)}")
-
-# Find all problematic fscrypt v1 blocks to disable
-# Strategy: find 'fscrypt_policy_get_struct' line, go back to find the 'if (' that starts
-# the block, then track braces to find the closing brace.
-modified = False
-i = 0
-new_lines = []
-
-while i < len(lines):
-    line = lines[i]
-    
-    # Look for the fscrypt_policy_get_struct or lookup_ref_key (both v1-only patterns)
-    if 'fscrypt_policy_get_struct' in line:
-        # Find the start of the enclosing 'if' block (check current and previous lines)
-        if_start_in_new = len(new_lines)
-        # Look backwards in new_lines for 'if ('
-        found_if = False
-        for j in range(len(new_lines)-1, max(0, len(new_lines)-10), -1):
-            if re.search(r'\bif\s*\(', new_lines[j]):
-                if_start_in_new = j
-                found_if = True
-                break
-        
-        if not found_if:
-            # If not found, insert #if 0 before current line
-            new_lines.append('#if 0  /* disabled: fscrypt v1 API removed in vold v2 */\n')
-            new_lines.append(line)
-        else:
-            # Insert #if 0 before the if statement in new_lines
-            new_lines.insert(if_start_in_new, '#if 0  /* disabled: fscrypt v1 API removed in vold v2 */\n')
-            new_lines.append(line)
-        
-        # Now consume lines until the closing brace of the if block
-        brace_depth = 0
-        while i < len(lines):
-            current = lines[i]
-            new_lines.append(current)
-            brace_depth += current.count('{') - current.count('}')
-            if brace_depth < 0:
-                break
-            if brace_depth == 0 and '{' in ''.join(lines[max(0,i-20):i+1]):
-                break
-            i += 1
-        
-        new_lines.append('#endif  /* fscrypt v1 disabled */\n')
-        modified = True
-        print(f"Disabled fscrypt block ending at line {i+1}")
-    else:
-        new_lines.append(line)
-    
-    i += 1
-
-if modified:
-    with open('bootable/recovery/libtar/append.c', 'w') as f:
-        f.writelines(new_lines)
-    print("Successfully patched libtar/append.c")
-else:
-    print("fscrypt_policy_get_struct not found - no patch needed")
-PYEOF
-
-            echo "=== Patching libtar build files for -Wno-error fallback ==="
-            for MK in bootable/recovery/libtar/Android.mk bootable/recovery/libtar/Android.bp; do
-              if [ -f "$MK" ]; then
-                echo "Found: $MK"
-                cat "$MK"
-              fi
-            done
-
-            # Suppress Werror for libtar as a fallback safety net
-            if [ -f "bootable/recovery/libtar/Android.mk" ]; then
-              echo 'LOCAL_CFLAGS += -Wno-error=incompatible-pointer-types -Wno-error=implicit-function-declaration -Wno-error=int-conversion' \
-                >> bootable/recovery/libtar/Android.mk
-              echo "Added Wno-error flags to Android.mk"
-            fi
-          else
-            echo "WARNING: libtar append.c not found at $APPEND_C"
-            find bootable/ -name "append.c" 2>/dev/null || echo "No append.c found in bootable/"
+          # Add -Wno-error fallback to libtar build files
+          if [ -f "bootable/recovery/libtar/Android.mk" ]; then
+            echo 'LOCAL_CFLAGS += -Wno-error=incompatible-pointer-types -Wno-error=implicit-function-declaration -Wno-error=int-conversion' \
+              >> bootable/recovery/libtar/Android.mk
+            echo "Added Wno-error flags to libtar Android.mk"
+          fi
+          if [ -f "bootable/recovery/libtar/Android.bp" ]; then
+            echo "libtar Android.bp contents:"
+            cat bootable/recovery/libtar/Android.bp
           fi
 
       - name: Run TWRP Compilation
