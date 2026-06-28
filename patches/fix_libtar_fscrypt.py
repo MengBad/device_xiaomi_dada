@@ -1,23 +1,24 @@
 #!/usr/bin/env python3
 import os
 
-# 1. Patch append.c, block.c, and extract.c to disable v1 fscrypt function calls
-files_to_disable = [
-    'bootable/recovery/libtar/append.c',
-    'bootable/recovery/libtar/block.c',
-    'bootable/recovery/libtar/extract.c'
-]
-for filepath in files_to_disable:
-    if os.path.exists(filepath):
-        print(f"Disabling fscrypt in {filepath}...")
-        with open(filepath, 'r') as f:
-            content = f.read()
-        new_content = content.replace('#ifdef USE_FSCRYPT', '#if defined(USE_FSCRYPT) && 0')
-        with open(filepath, 'w') as f:
-            f.write(new_content)
-        print(f"Successfully patched {filepath}")
-    else:
-        print(f"File not found: {filepath}")
+# 1. Recursively find and patch all .c and .h files in libtar to disable USE_FSCRYPT blocks
+libtar_dir = 'bootable/recovery/libtar'
+if os.path.exists(libtar_dir):
+    print(f"Scanning {libtar_dir} to disable USE_FSCRYPT blocks...")
+    for root, dirs, files in os.walk(libtar_dir):
+        for file in files:
+            if file.endswith(('.c', '.h')):
+                filepath = os.path.join(root, file)
+                with open(filepath, 'r') as f:
+                    content = f.read()
+                if '#ifdef USE_FSCRYPT' in content:
+                    print(f"Disabling fscrypt in {filepath}...")
+                    new_content = content.replace('#ifdef USE_FSCRYPT', '#if defined(USE_FSCRYPT) && 0')
+                    with open(filepath, 'w') as f:
+                        f.write(new_content)
+                    print(f"Successfully patched {filepath}")
+else:
+    print(f"Directory not found: {libtar_dir}")
 
 # 2. Patch libtar.h to fix the struct fscrypt_policy tag issue
 libtar_h = 'bootable/recovery/libtar/libtar.h'
