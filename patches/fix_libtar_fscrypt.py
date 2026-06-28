@@ -41,3 +41,27 @@ if os.path.exists(libtar_h):
     print(f"Successfully patched {libtar_h}")
 else:
     print(f"File not found: {libtar_h}")
+
+# 3. Patch partitionmanager.cpp to add weak stubs for missing legacy FDE functions
+partitionmanager_cpp = 'bootable/recovery/partitionmanager.cpp'
+if os.path.exists(partitionmanager_cpp):
+    print(f"Adding cryptfs stubs to {partitionmanager_cpp}...")
+    with open(partitionmanager_cpp, 'r') as f:
+        content = f.read()
+    
+    stubs = """
+#ifdef __cplusplus
+extern "C" {
+#endif
+    int __attribute__((weak)) cryptfs_get_password_type(void) { return -1; }
+    int __attribute__((weak)) cryptfs_check_passwd(const char* password) { return -1; }
+#ifdef __cplusplus
+}
+#endif
+"""
+    if 'cryptfs_get_password_type(void)' not in content:
+        with open(partitionmanager_cpp, 'w') as f:
+            f.write(stubs + content)
+        print(f"Successfully patched {partitionmanager_cpp}")
+else:
+    print(f"File not found: {partitionmanager_cpp}")
