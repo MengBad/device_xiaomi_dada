@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 import os
 
-# 1. Patch append.c and block.c to disable v1 fscrypt function calls
+# 1. Patch append.c, block.c, and extract.c to disable v1 fscrypt function calls
 files_to_disable = [
     'bootable/recovery/libtar/append.c',
-    'bootable/recovery/libtar/block.c'
+    'bootable/recovery/libtar/block.c',
+    'bootable/recovery/libtar/extract.c'
 ]
 for filepath in files_to_disable:
     if os.path.exists(filepath):
