@@ -5,7 +5,19 @@ cc_library {
 }
 
 cc_library {
+    name: "android.security.apc-V1-ndk_platform",
+    srcs: ["dummy.c"],
+    recovery_available: true,
+}
+
+cc_library {
     name: "android.security.authorization-ndk_platform",
+    srcs: ["dummy.c"],
+    recovery_available: true,
+}
+
+cc_library {
+    name: "android.security.authorization-V1-ndk_platform",
     srcs: ["dummy.c"],
     recovery_available: true,
 }
@@ -17,13 +29,43 @@ cc_library {
 }
 
 cc_library {
+    name: "android.security.compat-V1-ndk_platform",
+    srcs: ["dummy.c"],
+    recovery_available: true,
+}
+
+cc_library {
     name: "android.security.maintenance-ndk_platform",
     srcs: ["dummy.c"],
     recovery_available: true,
 }
 
 cc_library {
+    name: "android.security.maintenance-V1-ndk_platform",
+    srcs: ["dummy.c"],
+    recovery_available: true,
+}
+
+cc_library {
     name: "android.system.keystore2-ndk_platform",
+    srcs: ["dummy.c"],
+    recovery_available: true,
+}
+
+cc_library {
+    name: "android.system.keystore2-V1-ndk_platform",
+    srcs: ["dummy.c"],
+    recovery_available: true,
+}
+
+cc_library {
+    name: "android.system.keystore2-V2-ndk_platform",
+    srcs: ["dummy.c"],
+    recovery_available: true,
+}
+
+cc_library {
+    name: "android.system.keystore2-V3-ndk_platform",
     srcs: ["dummy.c"],
     recovery_available: true,
 }
