@@ -1,5 +1,14 @@
-# Inherit from those products. Most specific first.
+# Configure base.mk first to pull in all target binaries/libraries
+$(call inherit-product, $(SRC_TARGET_DIR)/product/base.mk)
+
+# Configure core_64_bit_only.mk
 $(call inherit-product, $(SRC_TARGET_DIR)/product/core_64_bit_only.mk)
+
+# Configure virtual_ab_ota compression
+$(call inherit-product, $(SRC_TARGET_DIR)/product/virtual_ab_ota/compression_with_xor.mk)
+
+# Configure emulated storage
+$(call inherit-product, $(SRC_TARGET_DIR)/product/emulated_storage.mk)
 
 # Inherit from our custom TWRP product configuration
 $(call inherit-product, vendor/twrp/config/common.mk)

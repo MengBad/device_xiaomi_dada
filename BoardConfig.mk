@@ -66,6 +66,27 @@ TW_INPUT_BLACKLIST := "hbtp"
 TW_USE_TOOLBOX := true
 RECOVERY_SDCARD_ON_DATA := true
 
+# Copy vendor/odm files cleanly to recovery ramdisk
+TARGET_COPY_OUT_VENDOR := vendor
+TARGET_COPY_OUT_ODM := odm
+
+# Recovery Fstab Binding
+TARGET_RECOVERY_FSTAB := $(DEVICE_PATH)/recovery.fstab
+
+# TWRP Extra Tools
+TW_INCLUDE_7ZA := true
+TW_INCLUDE_REPACKTOOLS := true
+TW_INCLUDE_RESETPROP := true
+TW_INCLUDE_LIBRESETPROP := true
+TW_ENABLE_ALL_PARTITION_TOOLS := true
+
+# Debug & Logging Modules
+TWRP_INCLUDE_LOGCAT := true
+TARGET_RECOVERY_DEVICE_MODULES += debuggerd
+RECOVERY_BINARY_SOURCE_FILES += $(TARGET_OUT_EXECUTABLES)/debuggerd
+TARGET_RECOVERY_DEVICE_MODULES += strace
+RECOVERY_BINARY_SOURCE_FILES += $(TARGET_OUT_EXECUTABLES)/strace
+
 # Encryption/Decryption
 TW_INCLUDE_CRYPTO := true
 TW_INCLUDE_CRYPTO_FBE := true
