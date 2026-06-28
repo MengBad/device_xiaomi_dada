@@ -99,6 +99,8 @@ jobs:
           export ALLOW_MISSING_DEPENDENCIES=true
           export USE_CCACHE=1
           export CCACHE_DIR=~/.ccache
+          export GOGC=50
+          export GOMEMLIMIT=5GiB
           ccache -M 5G
           source build/envsetup.sh
           lunch twrp_dada-ap2a-eng
