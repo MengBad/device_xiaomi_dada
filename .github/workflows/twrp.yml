@@ -11,12 +11,17 @@ jobs:
     name: Build TWRP Recovery
     runs-on: ubuntu-22.04
     steps:
-      - name: Free Disk Space
-        run: |
-          sudo docker image prune -a -f
-          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /usr/local/share/boost
-          sudo rm -rf /usr/share/swift /usr/share/rust /usr/local/share/phantomjs
-          df -h
+      - name: Maximize Build Space
+        uses: easimon/maximize-build-space@v1.3.1
+        with:
+          root-reserve-mb: 5120
+          temp-reserve-mb: 100
+          remove-dotnet: 'true'
+          remove-android: 'true'
+          remove-haskell: 'true'
+          remove-codeql: 'true'
+          remove-docker-images: 'true'
+          overprovision-lvm: 'true'
 
       - name: Install Dependencies
         run: |
