@@ -1,23 +1,32 @@
 #!/usr/bin/env python3
 import os
 
-files_to_patch = [
+# 1. Patch append.c and block.c to disable v1 fscrypt function calls
+files_to_disable = [
     'bootable/recovery/libtar/append.c',
     'bootable/recovery/libtar/block.c'
 ]
-
-for filepath in files_to_patch:
+for filepath in files_to_disable:
     if os.path.exists(filepath):
-        print(f"Patching {filepath}...")
+        print(f"Disabling fscrypt in {filepath}...")
         with open(filepath, 'r') as f:
             content = f.read()
-        
-        # Replace `#ifdef USE_FSCRYPT` with `#if defined(USE_FSCRYPT) && 0`
-        # to disable all fscrypt v1 code blocks which are incompatible with vold v2.
         new_content = content.replace('#ifdef USE_FSCRYPT', '#if defined(USE_FSCRYPT) && 0')
-        
         with open(filepath, 'w') as f:
             f.write(new_content)
         print(f"Successfully patched {filepath}")
     else:
         print(f"File not found: {filepath}")
+
+# 2. Patch libtar.h to fix the struct fscrypt_policy tag issue
+libtar_h = 'bootable/recovery/libtar/libtar.h'
+if os.path.exists(libtar_h):
+    print(f"Fixing fscrypt struct tag in {libtar_h}...")
+    with open(libtar_h, 'r') as f:
+        content = f.read()
+    new_content = content.replace('fscrypt_policy\t*fep;', 'struct fscrypt_policy\t*fep;')
+    with open(libtar_h, 'w') as f:
+        f.write(new_content)
+    print(f"Successfully patched {libtar_h}")
+else:
+    print(f"File not found: {libtar_h}")
