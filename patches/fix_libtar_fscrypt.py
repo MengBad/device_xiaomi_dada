@@ -93,3 +93,70 @@ extern "C" {
                     print(f"Successfully patched {filepath}")
 else:
     print(f"Directory not found: {recovery_dir}")
+
+# 4. Patch system/vold/Keystore.cpp and system/vold/Decrypt.cpp to append weak stubs for missing keystore2/scrypt symbols
+keystore_cpp = 'system/vold/Keystore.cpp'
+if os.path.exists(keystore_cpp):
+    print(f"Appending keystore2 stubs to {keystore_cpp}...")
+    with open(keystore_cpp, 'r') as f:
+        content = f.read()
+    
+    keystore_stubs = """
+#ifdef __cplusplus
+namespace aidl {
+namespace android {
+namespace system {
+namespace keystore2 {
+    std::shared_ptr<IKeystoreService> __attribute__((weak)) IKeystoreService::fromBinder(const ::ndk::SpAIBinder& binder) {
+        return nullptr;
+    }
+}
+}
+namespace security {
+namespace maintenance {
+    std::shared_ptr<IKeystoreMaintenance> __attribute__((weak)) IKeystoreMaintenance::fromBinder(const ::ndk::SpAIBinder& binder) {
+        return nullptr;
+    }
+}
+}
+}
+}
+#endif
+"""
+    if 'IKeystoreService::fromBinder' not in content:
+        with open(keystore_cpp, 'a') as f:
+            f.write(keystore_stubs)
+        print(f"Successfully patched {keystore_cpp}")
+else:
+    print(f"File not found: {keystore_cpp}")
+
+decrypt_cpp = 'system/vold/Decrypt.cpp'
+if os.path.exists(decrypt_cpp):
+    print(f"Appending keystore2/scrypt stubs to {decrypt_cpp}...")
+    with open(decrypt_cpp, 'r') as f:
+        content = f.read()
+    
+    decrypt_stubs = """
+#ifdef __cplusplus
+namespace aidl {
+namespace android {
+namespace security {
+namespace authorization {
+    std::shared_ptr<IKeystoreAuthorization> __attribute__((weak)) IKeystoreAuthorization::fromBinder(const ::ndk::SpAIBinder& binder) {
+        return nullptr;
+    }
+}
+}
+}
+}
+extern "C" int __attribute__((weak)) crypto_scrypt(const uint8_t* passwd, size_t passwd_len, const uint8_t* salt, size_t salt_len, uint64_t N, uint32_t r, uint32_t p, uint8_t* buf, size_t buflen) {
+    return -1;
+}
+#endif
+"""
+    if 'IKeystoreAuthorization::fromBinder' not in content:
+        with open(decrypt_cpp, 'a') as f:
+            f.write(decrypt_stubs)
+        print(f"Successfully patched {decrypt_cpp}")
+else:
+    print(f"File not found: {decrypt_cpp}")
