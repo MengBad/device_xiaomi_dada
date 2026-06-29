@@ -38,6 +38,15 @@ jobs:
           echo "=== Disk Space After Cleanup ==="
           df -h
 
+          echo "=== Creating 8GB Swap File ==="
+          sudo swapon --show || true
+          sudo fallocate -l 8G /swapfile
+          sudo chmod 600 /swapfile
+          sudo mkswap /swapfile
+          sudo swapon /swapfile
+          sudo swapon --show || true
+          free -h
+
       - name: Install Dependencies
         run: |
           sudo apt-get update
