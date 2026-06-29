@@ -105,7 +105,7 @@ jobs:
             exit 1
           fi
 
-          echo "=== Patching CTS platform releases for Android 15 ==="
+          echo "=== Patching CTS platform releases for Android 16 ==="
           cts_releases_file="twrp-source/cts/tests/tests/os/assets/platform_releases.txt"
           if [ -f "$cts_releases_file" ]; then
             echo "Original platform_releases.txt:"
