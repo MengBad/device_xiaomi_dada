@@ -113,8 +113,8 @@ BOARD_USES_QCOM_FBE_DECRYPTION := true
 TW_EXCLUDE_FDE := true
 PLATFORM_SECURITY_PATCH := 2026-01-01
 
-# Platform version for Android 15
-PLATFORM_VERSION := 15
+# Platform version for Android 16
+PLATFORM_VERSION := 16
 PLATFORM_VERSION_LAST_STABLE := $(PLATFORM_VERSION)
 
 # System Properties

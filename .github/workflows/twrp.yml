@@ -95,8 +95,8 @@ jobs:
             grep -E "PLATFORM_VERSION\s*:=|PLATFORM_SDK_VERSION\s*:=" "$file_path" || true
             
             echo "=== Patching Version Variables ==="
-            sed -i 's/^\s*PLATFORM_VERSION\s*:=\s*[0-9]*/PLATFORM_VERSION := 15/g' "$file_path"
-            sed -i 's/^\s*PLATFORM_SDK_VERSION\s*:=\s*[0-9]*/PLATFORM_SDK_VERSION := 35/g' "$file_path"
+            sed -i 's/^\s*PLATFORM_VERSION\s*:=\s*[0-9]*/PLATFORM_VERSION := 16/g' "$file_path"
+            sed -i 's/^\s*PLATFORM_SDK_VERSION\s*:=\s*[0-9]*/PLATFORM_SDK_VERSION := 36/g' "$file_path"
             
             echo "=== Patched Version Variables ==="
             grep -E "PLATFORM_VERSION\s*:=|PLATFORM_SDK_VERSION\s*:=" "$file_path" || true
@@ -110,11 +110,11 @@ jobs:
           if [ -f "$cts_releases_file" ]; then
             echo "Original platform_releases.txt:"
             cat "$cts_releases_file"
-            if ! grep -qx "15" "$cts_releases_file"; then
-              echo "15" >> "$cts_releases_file"
-              echo "Added '15' to platform_releases.txt"
+            if ! grep -qx "16" "$cts_releases_file"; then
+              echo "16" >> "$cts_releases_file"
+              echo "Added '16' to platform_releases.txt"
             else
-              echo "'15' already present in platform_releases.txt"
+              echo "'16' already present in platform_releases.txt"
             fi
             echo "Updated platform_releases.txt:"
             cat "$cts_releases_file"
