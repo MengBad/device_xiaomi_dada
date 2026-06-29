@@ -94,36 +94,30 @@ extern "C" {
 else:
     print(f"Directory not found: {recovery_dir}")
 
-# 4. Patch system/vold/Keystore.cpp and system/vold/Decrypt.cpp to append weak stubs for missing keystore2/scrypt symbols
+# 4. Patch system/vold/Keystore.cpp and system/vold/Decrypt.cpp to append mangled C-linkage weak stubs for missing keystore2/scrypt symbols
 keystore_cpp = 'system/vold/Keystore.cpp'
 if os.path.exists(keystore_cpp):
-    print(f"Appending keystore2 stubs to {keystore_cpp}...")
+    print(f"Appending keystore2 C-mangled stubs to {keystore_cpp}...")
     with open(keystore_cpp, 'r') as f:
         content = f.read()
     
     keystore_stubs = """
-#ifdef __cplusplus
-namespace aidl {
-namespace android {
-namespace system {
-namespace keystore2 {
-    std::shared_ptr<IKeystoreService> __attribute__((weak)) IKeystoreService::fromBinder(const ::ndk::SpAIBinder& binder) {
-        return nullptr;
+extern "C" {
+    struct std_shared_ptr {
+        void* ptr;
+        void* cb;
+    };
+    struct std_shared_ptr __attribute__((weak)) _ZN4aidl7android6system9keystore216IKeystoreService10fromBinderERKN3ndk10SpAIBinderE(void* binder) {
+        struct std_shared_ptr ret = {0, 0};
+        return ret;
+    }
+    struct std_shared_ptr __attribute__((weak)) _ZN4aidl7android8security11maintenance20IKeystoreMaintenance10fromBinderERKN3ndk10SpAIBinderE(void* binder) {
+        struct std_shared_ptr ret = {0, 0};
+        return ret;
     }
 }
-}
-namespace security {
-namespace maintenance {
-    std::shared_ptr<IKeystoreMaintenance> __attribute__((weak)) IKeystoreMaintenance::fromBinder(const ::ndk::SpAIBinder& binder) {
-        return nullptr;
-    }
-}
-}
-}
-}
-#endif
 """
-    if 'IKeystoreService::fromBinder' not in content:
+    if '_ZN4aidl7android6system9keystore216IKeystoreService10fromBinder' not in content:
         with open(keystore_cpp, 'a') as f:
             f.write(keystore_stubs)
         print(f"Successfully patched {keystore_cpp}")
@@ -132,29 +126,28 @@ else:
 
 decrypt_cpp = 'system/vold/Decrypt.cpp'
 if os.path.exists(decrypt_cpp):
-    print(f"Appending keystore2/scrypt stubs to {decrypt_cpp}...")
+    print(f"Appending keystore2/scrypt C-mangled stubs to {decrypt_cpp}...")
     with open(decrypt_cpp, 'r') as f:
         content = f.read()
     
     decrypt_stubs = """
-#ifdef __cplusplus
-namespace aidl {
-namespace android {
-namespace security {
-namespace authorization {
-    std::shared_ptr<IKeystoreAuthorization> __attribute__((weak)) IKeystoreAuthorization::fromBinder(const ::ndk::SpAIBinder& binder) {
-        return nullptr;
+#include <stdint.h>
+#include <stddef.h>
+extern "C" {
+    struct std_shared_ptr {
+        void* ptr;
+        void* cb;
+    };
+    struct std_shared_ptr __attribute__((weak)) _ZN4aidl7android8security13authorization22IKeystoreAuthorization10fromBinderERKN3ndk10SpAIBinderE(void* binder) {
+        struct std_shared_ptr ret = {0, 0};
+        return ret;
+    }
+    int __attribute__((weak)) crypto_scrypt(const uint8_t* passwd, size_t passwd_len, const uint8_t* salt, size_t salt_len, uint64_t N, uint32_t r, uint32_t p, uint8_t* buf, size_t buflen) {
+        return -1;
     }
 }
-}
-}
-}
-extern "C" int __attribute__((weak)) crypto_scrypt(const uint8_t* passwd, size_t passwd_len, const uint8_t* salt, size_t salt_len, uint64_t N, uint32_t r, uint32_t p, uint8_t* buf, size_t buflen) {
-    return -1;
-}
-#endif
 """
-    if 'IKeystoreAuthorization::fromBinder' not in content:
+    if '_ZN4aidl7android8security13authorization22IKeystoreAuthorization10fromBinder' not in content:
         with open(decrypt_cpp, 'a') as f:
             f.write(decrypt_stubs)
         print(f"Successfully patched {decrypt_cpp}")
