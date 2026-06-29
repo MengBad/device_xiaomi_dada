@@ -12,12 +12,14 @@ TARGET_NO_BOOTLOADER := true
 
 # Kernel
 BOARD_BOOT_HEADER_VERSION := 4
+BOARD_KERNEL_BASE := 0x00000000
 BOARD_KERNEL_PAGESIZE := 4096
 BOARD_EXCLUDE_KERNEL_FROM_RECOVERY_IMAGE := true
 BOARD_RAMDISK_USE_LZ4 := true
 
 BOARD_MKBOOTIMG_ARGS += --header_version $(BOARD_BOOT_HEADER_VERSION)
 BOARD_MKBOOTIMG_ARGS += --pagesize $(BOARD_KERNEL_PAGESIZE)
+BOARD_MKBOOTIMG_ARGS += --base $(BOARD_KERNEL_BASE)
 
 # Prebuilt Kernel & DTB
 BOARD_PREBUILT_DTB := $(DEVICE_PATH)/prebuilt/dtb
@@ -32,7 +34,15 @@ BOARD_VENDOR_BOOTIMAGE_PARTITION_SIZE := 100663296
 # Dynamic Partitions
 BOARD_SUPER_PARTITION_SIZE := 11811160064
 BOARD_SUPER_PARTITION_GROUPS := qti_dynamic_partitions
-BOARD_QTI_DYNAMIC_PARTITIONS_PARTITION_LIST := system vendor product system_ext odm mi_ext
+BOARD_QTI_DYNAMIC_PARTITIONS_PARTITION_LIST := \
+    system \
+    system_ext \
+    product \
+    vendor \
+    odm \
+    mi_ext \
+    system_dlkm \
+    vendor_dlkm
 BOARD_QTI_DYNAMIC_PARTITIONS_SIZE := 11806965760
 
 # A/B
@@ -46,10 +56,13 @@ AB_OTA_PARTITIONS := \
     vbmeta \
     vbmeta_system \
     system \
-    vendor \
-    product \
     system_ext \
-    odm
+    product \
+    vendor \
+    odm \
+    mi_ext \
+    system_dlkm \
+    vendor_dlkm
 
 # Platform
 TARGET_BOARD_PLATFORM := sun
@@ -58,6 +71,7 @@ TARGET_BOARD_PLATFORM_GPU := qcom-adreno
 # Verified Boot (AVB)
 BOARD_AVB_ENABLE := true
 BOARD_AVB_ROLLBACK_INDEX := $(PLATFORM_SECURITY_PATCH_TIMESTAMP)
+BOARD_AVB_MAKE_VBMETA_IMAGE_ARGS += --flags 3
 
 # TWRP Configuration
 TW_THEME := portrait_hdpi
@@ -98,6 +112,10 @@ BOARD_USES_QCOM_FBE_DECRYPTION := true
 # Exclude legacy FDE support to fix compile stubs (Xiaomi 15 uses FBE v2)
 TW_EXCLUDE_FDE := true
 PLATFORM_SECURITY_PATCH := 2026-01-01
+
+# Platform version for Android 15
+PLATFORM_VERSION := 15
+PLATFORM_VERSION_LAST_STABLE := $(PLATFORM_VERSION)
 
 # System Properties
 TARGET_SYSTEM_PROP := $(DEVICE_PATH)/system.prop
