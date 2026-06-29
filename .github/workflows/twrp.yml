@@ -105,6 +105,23 @@ jobs:
             exit 1
           fi
 
+          echo "=== Patching CTS platform releases for Android 15 ==="
+          cts_releases_file="twrp-source/cts/tests/tests/os/assets/platform_releases.txt"
+          if [ -f "$cts_releases_file" ]; then
+            echo "Original platform_releases.txt:"
+            cat "$cts_releases_file"
+            if ! grep -qx "15" "$cts_releases_file"; then
+              echo "15" >> "$cts_releases_file"
+              echo "Added '15' to platform_releases.txt"
+            else
+              echo "'15' already present in platform_releases.txt"
+            fi
+            echo "Updated platform_releases.txt:"
+            cat "$cts_releases_file"
+          else
+            echo "WARNING: CTS platform_releases.txt not found at $cts_releases_file"
+          fi
+
       - name: Patch libtar fscrypt v1/v2 compatibility
         run: |
           cd twrp-source
